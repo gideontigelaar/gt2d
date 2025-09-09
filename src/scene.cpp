@@ -13,7 +13,8 @@ Scene::Scene(int screenWidth, int screenHeight) {
 
 Scene::~Scene() {}
 
-void Scene::Update() {
+void Scene::Update(float deltaTime) {
+    squareRect.x += static_cast<int>(100 * deltaTime);
 }
 
 void Scene::Render(SDL_Renderer* renderer) {

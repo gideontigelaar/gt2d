@@ -8,7 +8,7 @@ public:
     Scene(int screenWidth, int screenHeight);
     ~Scene();
 
-    void Update();
+    void Update(float deltaTime);
 
     void Render(SDL_Renderer* renderer);
 

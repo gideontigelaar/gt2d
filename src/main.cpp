@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <chrono>
 
 #include <SDL.h>
 #include "scene.h"
@@ -8,11 +9,9 @@
 #define SCREEN_HEIGHT 600
 
 int main(int argc, char* argv[]) {
-    // Unused argc, argv
     (void) argc;
     (void) argv;
 
-    // Initialize SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL could not be initialized!" << std::endl
                   << "SDL_Error: " << SDL_GetError() << std::endl;
@@ -27,7 +26,6 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    // Create window
     SDL_Window *window = SDL_CreateWindow(
         "Basic C++ SDL project",
         SDL_WINDOWPOS_UNDEFINED,
@@ -40,44 +38,55 @@ int main(int argc, char* argv[]) {
         std::cout << "Window could not be created!" << std::endl
                   << "SDL_Error: " << SDL_GetError() << std::endl;
     } else {
-        // Create renderer
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         if(!renderer) {
             std::cout << "Renderer could not be created!" << std::endl
                       << "SDL_Error: " << SDL_GetError() << std::endl;
         } else {
-            // Create the scene
             Scene scene(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-            // Event loop exit flag
             bool quit = false;
 
-            // Event loop
+            const float TARGET_FPS = 60.0f;
+            const float TARGET_FRAME_TIME = 1.0f / TARGET_FPS;
+            const float MAX_DELTA_TIME = 0.1f;
+
+            auto frameStart = std::chrono::high_resolution_clock::now();
+            auto lastTime = frameStart;
+
             while(!quit) {
+                auto currentTime = std::chrono::high_resolution_clock::now();
+                float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+                lastTime = currentTime;
+
+                deltaTime = std::min(deltaTime, MAX_DELTA_TIME);
+
                 SDL_Event e;
-
-                // Wait indefinitely for the next available event
-                SDL_WaitEvent(&e);
-
-                // User requests quit
-                if(e.type == SDL_QUIT) {
-                    quit = true;
+                while(SDL_PollEvent(&e)) {
+                    if(e.type == SDL_QUIT) {
+                        quit = true;
+                    }
                 }
 
-                // Update and render the scene
-                scene.Update();
+                scene.Update(deltaTime);
                 scene.Render(renderer);
+
+                auto frameEnd = std::chrono::high_resolution_clock::now();
+                float frameTime = std::chrono::duration<float>(frameEnd - frameStart).count();
+
+                if(frameTime < TARGET_FRAME_TIME) {
+                    SDL_Delay(static_cast<Uint32>((TARGET_FRAME_TIME - frameTime) * 1000.0f));
+                }
+
+                frameStart = std::chrono::high_resolution_clock::now();
             }
 
-            // Destroy renderer
             SDL_DestroyRenderer(renderer);
         }
 
-        // Destroy window
         SDL_DestroyWindow(window);
     }
 
-    // Quit SDL
     SDL_Quit();
 
     return 0;
