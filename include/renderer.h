@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "scene.h"
+#include "resourcemanager.h"
 
 class Renderer
 {

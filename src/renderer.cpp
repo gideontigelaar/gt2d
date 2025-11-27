@@ -29,26 +29,10 @@ void Renderer::RenderScene()
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
-    SDL_Surface* img = IMG_Load("assets/Screenshot 2025-11-25 at 12.45.20.png");
-    if (!img) {
-        std::cout << "IMG_Load error: " << IMG_GetError() << "\n";
-        return;
-    }
+    SDL_Texture* tex = ResourceManager::GetInstance()->GetTexture("assets/Screenshot 2025-11-25 at 12.45.20.png", renderer);
 
-    // Convert surface → texture
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, img);
-    SDL_FreeSurface(img); // surface kan weg
-
-    if (!tex) {
-        std::cout << "Texture error: " << SDL_GetError() << "\n";
-        return;
-    }
-
-    // Render de texture
     SDL_RenderCopy(renderer, tex, NULL, NULL);
-    SDL_DestroyTexture(tex);
 
-    // Present result
     SDL_RenderPresent(renderer);
 }
 
