@@ -41,3 +41,8 @@ target_link_libraries(${PROJECT_NAME} SDL2::TTF)
 # Add SDL2_gfx library
 find_package(SDL2_gfx REQUIRED)
 target_link_libraries(${PROJECT_NAME} SDL2::GFX)
+
+file (
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
